@@ -31,6 +31,7 @@ jobs:
         shell: bash -l {0}
 
       - name: Archive report
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: sast-report
