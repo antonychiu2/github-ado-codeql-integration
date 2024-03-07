@@ -22,6 +22,7 @@ jobs:
         
     - name: Run Checkmarx CLI Scan
       run: |
+        # Make sure to to change your ProjectName to the format 'CxServer/SP/Company/Users/my project'. See CX documentation for more details: https://checkmarx.com/resource/documents/en/34965-8152-running-scans-from-the-cli.html
         ./runCxConsole.sh Scan -v \
           -ProjectName 'CxServer\Mobb\Mobb-Autofix-Project' \
           -CxServer ${{ secrets.CHECKMARX_URL }} \
