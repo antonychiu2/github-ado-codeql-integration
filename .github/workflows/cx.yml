@@ -23,9 +23,7 @@ jobs:
     - name: Run Checkmarx CLI Scan
       run: |
         ./runCxConsole.sh Scan -v \
-
-          -ProjectName 'CxServer\Mobb\Mobb-Autofixer-Project' \
-
+          -ProjectName 'CxServer\Mobb1\Mobb-Autofixer-Project' \
           -CxServer ${{ secrets.CHECKMARX_URL }} \
           -cxuser ${{ secrets.CHECKMARX_USERNAME }} \
           -cxpassword ${{ secrets.CHECKMARX_PASSWORD }} \
