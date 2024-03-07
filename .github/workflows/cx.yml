@@ -1,20 +1,7 @@
-# Mobb/Checkamrx Fixer on pull requests
-# This workflow defines the needed steps to run Checkmarx on every pull request and pass the results to Mobb Fixer.
-#
-# Secrets in use (add your missing ones):
-# CX_TENANT - your Checkmarx tenant name (found in your Checkmarx settings)
-# CX_API_TOKEN - your Checkmarx credentials (find how to get it here: https://checkmarx.com/resource/documents/en/34965-68775-generating-a-refresh-token--api-key-.html)
-# CX_BASE_URI - your Checkmarx app url, e.g. "https://ast.checkmarx.net/"
-# CX_BASE_AUTH_URI - your Checkmarx auth url, e.g. "https://iam.checkmarx.net/"
-# MOBB_API_TOKEN - your mobb user credentials (autumatially set if you used the Mobb app to configure the integration)
-# GITHUB_TOKEN - automatically set by GitHub
-
 name: "Mobb/Checkmarx CLI"
-
 on:
   pull_request:
     branches: ["*"]
-
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -23,14 +10,10 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-      #with: 
-        #path: source-code
     - name: Download Checkmarx CLI 
       run: |
         wget -O cxcli.zip https://download.checkmarx.com/9.5.0/Plugins/CxConsolePlugin-1.1.30.zip
-        unzip cxcli.zip
-        ls -l
-        
+        unzip cxcli.zip        
     - name: Run Checkmarx CLI Scan
       run: |
         ./runCxConsole.sh Scan -v \
@@ -43,18 +26,12 @@ jobs:
           -SASTHigh 1 \
           -ReportXML "report.xml"    
       shell: bash -l {0}
-
-    - name: Check env
-      run: |
-        ls -lah
-      
     - name: Archive report
       if: always()
       uses: actions/upload-artifact@v3
       with:
         name: sast-report
-        path: Checkmarx/Reports/report.xml
-        
+        path: Checkmarx/Reports/report.xml        
     - name: Run Mobb on the findings and get fixes
       if: always()
       uses: mobb-dev/action/review@v1.1
@@ -63,4 +40,3 @@ jobs:
         api-key: ${{ secrets.MOBB_API_TOKEN }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         scanner: checkmarx
-
