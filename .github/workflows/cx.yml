@@ -22,15 +22,16 @@ jobs:
         
     - name: Run Checkmarx CLI Scan
       run: |
+        # Make sure to to change your ProjectName to the format 'CxServer/SP/Company/Users/my project'. See CX documentation for more details: https://checkmarx.com/resource/documents/en/34965-8152-running-scans-from-the-cli.html
         ./runCxConsole.sh Scan -v \
-          -ProjectName 'CxServer\Mobb1\Mobb-Autofixer-Project' \
-          -CxServer ${{ secrets.CHECKMARX_URL }} \
+          -ProjectName 'CxServer\Mobb\Mobb-Autofixer-Project' \
+          -CxServer ${{ secrets.CHECKMARX_URL }} \ 
           -cxuser ${{ secrets.CHECKMARX_USERNAME }} \
           -cxpassword ${{ secrets.CHECKMARX_PASSWORD }} \
           -LocationType folder \
           -LocationPath "./" \
           -SASTHigh 1 \
-          -ReportXML "report.xml"    
+          -ReportXML "report.xml"
       shell: bash -l {0}
       
     - name: Archive report
