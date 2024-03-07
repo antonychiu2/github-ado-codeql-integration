@@ -1,3 +1,7 @@
+
+# Mobb/Checkamrx Fixer on pull requests
+# This workflow defines the needed steps to run Checkmarx on every pull request and pass the results to Mobb Fixer.
+
 name: "Mobb/Checkmarx CLI"
 on:
   pull_request:
@@ -10,14 +14,18 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+
     - name: Download Checkmarx CLI 
       run: |
         wget -O cxcli.zip https://download.checkmarx.com/9.5.0/Plugins/CxConsolePlugin-1.1.30.zip
-        unzip cxcli.zip        
+        unzip cxcli.zip
+        
     - name: Run Checkmarx CLI Scan
       run: |
         ./runCxConsole.sh Scan -v \
-          -ProjectName 'CxServer\Mobb1\Mobb-Autofixer-Project' \
+
+          -ProjectName 'CxServer\Mobb\Mobb-Autofixer-Project' \
+
           -CxServer ${{ secrets.CHECKMARX_URL }} \
           -cxuser ${{ secrets.CHECKMARX_USERNAME }} \
           -cxpassword ${{ secrets.CHECKMARX_PASSWORD }} \
@@ -26,6 +34,7 @@ jobs:
           -SASTHigh 1 \
           -ReportXML "report.xml"    
       shell: bash -l {0}
+      
     - name: Archive report
       if: always()
       uses: actions/upload-artifact@v3
