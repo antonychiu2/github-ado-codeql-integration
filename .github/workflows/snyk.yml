@@ -39,10 +39,11 @@ jobs:
           
       - name: Run Mobb on the findings and get fixes
         if: always()
-        uses: antonychiu2/mobb-action/@mobb-project-name-v2
+        uses: antonychiu2/mobb-action/review@mobb-project-name-v2
         with:
           report-file: "/home/runner/report.json"
           api-key: ${{ secrets.MOBB_API_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           mobb-project-name: 'Test Project From GitHub Actions'
+          scanner: 'snyk'
 
