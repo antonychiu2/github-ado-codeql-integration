@@ -39,7 +39,7 @@ jobs:
           
       - name: Run Mobb on the findings and get fixes
         if: always()
-        uses: antonychiu2/mobb-action/@beta-mobb-project-name
+        uses: antonychiu2/mobb-action/@latest
         with:
           report-file: "/home/runner/report.json"
           api-key: ${{ secrets.MOBB_API_TOKEN }}
