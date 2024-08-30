@@ -6,15 +6,6 @@
 trigger:
 - main
 
-parameters:
-  - name: scanLanguages
-    type: string
-    default: "java"
-    values:
-      - java
-      - javascript
-
-
 pool:
   vmImage: ubuntu-latest
 
@@ -36,13 +27,13 @@ steps:
 
 - script: |
     env
-    echo "Running CodeQL for ${{ parameters.scanLanguages }}"
-    mkdir -p $(Build.StagingDirectory)/codeqldb/${{ parameters.scanLanguages }}
+    echo "Running CodeQL for $(scanLanguage)"
+    mkdir -p $(Build.StagingDirectory)/codeqldb/$(scanLanguage)
     
-    codeql/codeql database create $(Build.StagingDirectory)/codeqldb/${{ parameters.scanLanguages }} \
+    codeql/codeql database create $(Build.StagingDirectory)/codeqldb/$(scanLanguage) \
     --no-run-unnecessary-builds \
-    --language=${{ parameters.scanLanguages }}
-  displayName: 'CodeQL Database Build for ${{ parameters.scanLanguages }}'
+    --language=$(scanLanguage)
+  displayName: 'CodeQL Database Build for $$(scanLanguage)'
 
 
 
