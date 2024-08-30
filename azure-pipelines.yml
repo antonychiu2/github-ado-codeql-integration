@@ -8,68 +8,69 @@ trigger:
 
 variables:
 - group: Tokens
+jobs:
+- job: A
+  pool:
+    vmImage: ubuntu-latest
 
-pool:
-  vmImage: ubuntu-latest
+  strategy:
+    matrix:
+      java:
+        scanLanguage: "java"
+      javascript:
+        scanLanguage: "javascript"
 
-strategy:
-  matrix:
-    java:
-      scanLanguage: "java"
-    javascript:
-      scanLanguage: "javascript"
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.18.x'
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+      
+  - script: |
+      npm -v
+      node -v
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '18.18.x'
-- task: JavaToolInstaller@0
-  inputs:
-    versionSpec: '17'
-    jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'
-    
-- script: |
-    npm -v
-    node -v
+  - script: |
+      env
+      echo "Running CodeQL for $(scanLanguage)"
+      wget https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.18.2/codeql-bundle-linux64.tar.gz 
+      tar -xf codeql-bundle-linux64.tar.gz
+    displayName: 'CodeQL Download Build for '
 
-- script: |
-    env
-    echo "Running CodeQL for $(scanLanguage)"
-    wget https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.18.2/codeql-bundle-linux64.tar.gz 
-    tar -xf codeql-bundle-linux64.tar.gz
-  displayName: 'CodeQL Download Build for '
+  - script: |
+        mkdir $(Build.StagingDirectory)/codeqldb
+        codeql/codeql database create $(Build.StagingDirectory)/codeqldb/$(scanLanguage) --source-root "./" --no-run-unnecessary-builds --language=$(scanLanguage)
+    displayName: 'codeql: database-build-$(scanLanguage)'
+    continueOnError: true
 
-- script: |
-      mkdir $(Build.StagingDirectory)/codeqldb
-      codeql/codeql database create $(Build.StagingDirectory)/codeqldb/$(scanLanguage) --source-root "./" --no-run-unnecessary-builds --language=$(scanLanguage)
-  displayName: 'codeql: database-build-$(scanLanguage)'
-  continueOnError: true
+  # CodeQL analyzing the built database and the language that has been stored in parameters.scanLanguages.
+  - script: |
+        codeql/codeql database analyze $(Build.StagingDirectory)/codeqldb/$(scanLanguage) --ram=4096 --format=sarif-latest --output=devops-$(scanLanguage).sarif --sarif-category=$(scanLanguage) --verbose
+    displayName: 'codeql: database-analyze-$(scanLanguage)'
+    continueOnError: true
 
-# CodeQL analyzing the built database and the language that has been stored in parameters.scanLanguages.
-- script: |
-      codeql/codeql database analyze $(Build.StagingDirectory)/codeqldb/$(scanLanguage) --ram=4096 --format=sarif-latest --output=devops-$(scanLanguage).sarif --sarif-category=$(scanLanguage) --verbose
-  displayName: 'codeql: database-analyze-$(scanLanguage)'
-  continueOnError: true
+    # Uplocading the results to GitHub as a sarif file.
+  - script: |
+      echo $GITHUB_TOKEN | codeql/codeql github upload-results --repository=$BUILD_REPOSITORY_NAME \
+      --ref=$BUILD_SOURCEBRANCH --commit=$BUILD_SOURCEVERSION \
+      --sarif=devops-$(scanLanguage).sarif
+    displayName: 'codeql: publish-results-github-$(scanLanguage)' 
+    continueOnError: true
+    env:
+      GITHUB_TOKEN: $(GitHubPAT)
 
-  # Uplocading the results to GitHub as a sarif file.
-- script: |
-    echo $GITHUB_TOKEN | codeql/codeql github upload-results --repository=$BUILD_REPOSITORY_NAME \
-    --ref=$BUILD_SOURCEBRANCH --commit=$BUILD_SOURCEVERSION \
-    --sarif=devops-$(scanLanguage).sarif
-  displayName: 'codeql: publish-results-github-$(scanLanguage)' 
-  continueOnError: true
-  env:
-    GITHUB_TOKEN: $(GitHubPAT)
-
-  # Publishing artifacts.
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'devops-$(scanLanguage).sarif'
-    ArtifactName: 'codeql-scan-$(scanLanguage)'
-    publishLocation: 'Container'
-  displayName: 'codeql: publish-results-devops-$(scanLanguage)'
-  continueOnError: true
+    # Publishing artifacts.
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: 'devops-$(scanLanguage).sarif'
+      ArtifactName: 'codeql-scan-$(scanLanguage)'
+      publishLocation: 'Container'
+    displayName: 'codeql: publish-results-devops-$(scanLanguage)'
+    continueOnError: true
 
 
 
