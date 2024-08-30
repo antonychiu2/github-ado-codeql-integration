@@ -79,7 +79,7 @@ jobs:
       node -v
       ls -lah
       jq -s '.[0].runs += .[1].runs | .[0]' $AGENT_BUILDDIRECTORY/codeql-scan-javascript/devops-javascript.sarif $AGENT_BUILDDIRECTORY/codeql-scan-java/devops-java.sarif > combined.sarif
-      export MOBBURL=$(npx mobbdev@latest analyze -f combined.sarif -r $BUILD_REPOSITORY_URI --ref $BUILD_SOURCEBRANCHNAME --api-key $(MOBB_API_TOKEN) --ci)
+      export MOBBURL=$(npx mobbdev@latest analyze -f combined.sarif -r $BUILD_REPOSITORY_URI --ref $SYSTEM_PULLREQUEST_SOURCEBRANCH --api-key $(MOBB_API_TOKEN) --ci)
       MOBBURL=$(echo "$MOBBURL" | sed 's/\x1B\[1m//g; s/\x1B\[22m//g') # Remove ANSI formatting characters
       echo Mobb URL: $MOBBURL
 
