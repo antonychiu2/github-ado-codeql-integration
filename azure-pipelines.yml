@@ -75,7 +75,7 @@ jobs:
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
-      targetPath: $(Build.DefaultWorkingDirectory)
+      targetPath: $(SYSTEM_DEFAULTWORKINGDIRECTORY)
 
   - task: NodeTool@0
     inputs:
@@ -83,11 +83,11 @@ jobs:
       
   - script: |
       echo "this will run when CodeQL_Scan_Job runs and succeeds"
-      ls -lah
+      ls -lahR
       env
       node -v
       jq -s '.[0].runs += .[1].runs | .[0]' codeql-scan-javascript/devops-javascript.sarif codeql-scan-java/devops-java.sarif > combined.sarif
-      ls -lah
+      ls -lahR
       export MOBBURL=$(npx mobbdev@latest analyze -f conbined.sarif -r $BUILD_REPOSITORY_URI --ref $BUILD_SOURCEBRANCHNAME --api-key $(MOBB_API_TOKEN) --ci)
       MOBBURL=$(echo "$MOBBURL" | sed 's/\x1B\[1m//g; s/\x1B\[22m//g') # Remove ANSI formatting characters
       echo Mobb URL: $MOBBURL
