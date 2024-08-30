@@ -22,9 +22,7 @@ jobs:
       versionSpec: '17'
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
-  - script: |
-      npm -v
-      node -v
+      
   - script: |
       env
       echo "Running CodeQL for $(scanLanguage)"
