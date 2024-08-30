@@ -6,6 +6,15 @@
 trigger:
 - main
 
+parameters:
+  - name: scanLanguages
+    type: string
+    default: "java"
+    values:
+      - java
+      - javascript
+
+
 pool:
   vmImage: ubuntu-latest
 
