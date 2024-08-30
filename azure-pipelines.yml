@@ -75,7 +75,7 @@ jobs:
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
-      targetPath: $(SYSTEM_DEFAULTWORKINGDIRECTORY)
+      targetPath: $SYSTEM_DEFAULTWORKINGDIRECTORY
 
   - task: NodeTool@0
     inputs:
