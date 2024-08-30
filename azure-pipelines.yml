@@ -23,7 +23,12 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18.18.x'
-
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '17'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+    
 - script: |
     npm -v
     node -v
