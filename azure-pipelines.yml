@@ -72,11 +72,16 @@ jobs:
   - CodeQL_Scan_Job
   condition: succeeded('CodeQL_Scan_Job')
   steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      downloadPath: $(System.ArtifactsDirectory)
+
   - script: |
       echo "this will run when CodeQL_Scan_Job runs and succeeds"
       ls
       env
       node -v
-      
+
 
 
