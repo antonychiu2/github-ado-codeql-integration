@@ -18,11 +18,32 @@ parameters:
 pool:
   vmImage: ubuntu-latest
 
+strategy:
+  matrix:
+    java:
+      scanLanguage: "java"
+    javascript:
+      scanLanguage: "javascript"
+
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: NodeTool@0
+  inputs:
+    versionSpec: '8.x'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    npm -v
+    node -v
+
+- script: |
+    env
+    echo "Running CodeQL for ${{ parameters.scanLanguages }}"
+    mkdir -p $(Build.StagingDirectory)/codeqldb/${{ parameters.scanLanguages }}
+    
+    codeql/codeql database create $(Build.StagingDirectory)/codeqldb/${{ parameters.scanLanguages }} \
+    --no-run-unnecessary-builds \
+    --language=${{ parameters.scanLanguages }}
+  displayName: 'CodeQL Database Build for ${{ parameters.scanLanguages }}'
+
+
+
+
