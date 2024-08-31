@@ -84,15 +84,15 @@ jobs:
       echo Mobb URL: $MOBBURL
 
       # Update the Pull Request comments section with a dedicated Mobb link that allows users to interface with Mobb UI to customize their fix. 
-      curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-      -d '{
-        "state": "success",
-        "target_url": "$MOBBURL",
-        "description": "Click "Details" to access the full fix analysis report",
-        "context": "Mobb Fix Report Link"
-      }' \
-      https://api.github.com/repos/$BUILD_REPOSITORY_ID/statuses/$SYSTEM_PULLREQUEST_SOURCECOMMITID
 
+      curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+       -d "{
+         \"state\": \"success\",
+         \"target_url\": \"$MOBBURL\",
+         \"description\": \"Click 'Details' to access the full fix analysis report\",
+         \"context\": \"Mobb Fix Report Link\"
+       }" \
+      https://api.github.com/repos/$BUILD_REPOSITORY_ID/statuses/$SYSTEM_PULLREQUEST_SOURCECOMMITID
     displayName: 'Mobb Autofixer'
     condition: always()
     env:
