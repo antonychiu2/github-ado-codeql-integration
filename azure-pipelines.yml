@@ -87,7 +87,7 @@ jobs:
       
       #This is the Mobb CLI. You supply Mobb with the sarif file, the repository URL, the branch, and Mobb CLI provides you with a fix report URL
       export MOBBURL=$(npx mobbdev@latest analyze -f combined.sarif -r $BUILD_REPOSITORY_URI --ref $SYSTEM_PULLREQUEST_SOURCEBRANCH --api-key $(MOBB_API_TOKEN) --ci)
-      MOBBURL=$(echo "$MOBBURL" | sed 's/\x1B\[1m//g; s/\x1B\[22m//g') # Remove ANSI formatting characters
+      MOBBURL=$(echo "$MOBBURL" | sed 's/\x1B\[1m//g; s/\x1B\[22m//g') # Remove ANSI formatting characters as they destroy the URL structure
       echo Mobb URL: $MOBBURL
 
       # (This step is optional) Update the Pull Request Status sectionwith a dedicated Mobb link that allows users to interface with Mobb UI to customize their fix. 
