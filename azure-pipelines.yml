@@ -14,21 +14,24 @@ jobs:
       javascript:
         scanLanguage: "javascript"
   steps:
+  
   - task: NodeTool@0
     inputs:
       versionSpec: '18.18.x'
+      
   - task: JavaToolInstaller@0
     inputs:
       versionSpec: '17'
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
-
+      
   - script: |
       env
       echo "Running CodeQL for $(scanLanguage)"
       wget https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.18.2/codeql-bundle-linux64.tar.gz 
       tar -xf codeql-bundle-linux64.tar.gz
     displayName: 'CodeQL Download Build for '
+    
   - script: |
         mkdir $(Build.StagingDirectory)/codeqldb
         codeql/codeql database create $(Build.StagingDirectory)/codeqldb/$(scanLanguage) --source-root "./" --no-run-unnecessary-builds --language=$(scanLanguage)
@@ -65,6 +68,7 @@ jobs:
   - CodeQL_Scan_Job
   condition: succeeded('CodeQL_Scan_Job')
   steps:
+  
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
