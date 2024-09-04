@@ -77,14 +77,16 @@ jobs:
       echo "this will run when CodeQL_Scan_Job runs and succeeds"
       env
       node -v
-      ls -lah
+      
+      #This combines the 2 sarif files (javascript and java scans) into a single sarif json file
       jq -s '.[0].runs += .[1].runs | .[0]' $AGENT_BUILDDIRECTORY/codeql-scan-javascript/devops-javascript.sarif $AGENT_BUILDDIRECTORY/codeql-scan-java/devops-java.sarif > combined.sarif
+      
+      #This is the Mobb CLI. You supply Mobb with the sarif file, the repository URL, the branch, and Mobb CLI provides you with a fix report URL
       export MOBBURL=$(npx mobbdev@latest analyze -f combined.sarif -r $BUILD_REPOSITORY_URI --ref $SYSTEM_PULLREQUEST_SOURCEBRANCH --api-key $(MOBB_API_TOKEN) --ci)
       MOBBURL=$(echo "$MOBBURL" | sed 's/\x1B\[1m//g; s/\x1B\[22m//g') # Remove ANSI formatting characters
       echo Mobb URL: $MOBBURL
 
-      # Update the Pull Request comments section with a dedicated Mobb link that allows users to interface with Mobb UI to customize their fix. 
-
+      # (This step is optional) Update the Pull Request Status sectionwith a dedicated Mobb link that allows users to interface with Mobb UI to customize their fix. 
       curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
        -d "{
          \"state\": \"success\",
